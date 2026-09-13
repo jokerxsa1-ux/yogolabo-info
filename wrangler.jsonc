@@ -1,0 +1,10 @@
+{
+  // 購入前に見せるページ(利用規約・プライバシーポリシー・動作確認)だけを置く静的サイト。
+  // アプリ本体とは別のドメイン(info.yogolabo.com)で配信し、
+  // 購入前の資料からアプリのURLが分からないようにする。
+  "name": "yogolabo-info",
+  "compatibility_date": "2026-09-05",
+  "assets": {
+    "directory": "./public"
+  }
+}

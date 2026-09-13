@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>動作確認｜年間業務管理・引き継ぎ支援ツール</title>
+    <style>
+      :root { color-scheme: light; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0; padding: 20px 16px 60px;
+        font-family: 'Hiragino Sans', 'Yu Gothic UI', 'Segoe UI', system-ui, sans-serif;
+        background: #f7f8f7; color: #23302b; line-height: 1.7;
+      }
+      .wrap { max-width: 640px; margin: 0 auto; }
+      h1 { font-size: 20px; margin: 0 0 4px; }
+      .lead { font-size: 14px; color: #66756f; margin: 0 0 20px; }
+      .card {
+        background: #fff; border: 1px solid #dfe4e1; border-radius: 12px;
+        padding: 16px; margin-bottom: 16px;
+      }
+      .verdict { font-size: 16px; font-weight: 700; padding: 14px 16px; border-radius: 10px; margin-bottom: 16px; }
+      .verdict.ok { background: #dff0e4; color: #1f6134; border: 1px solid #1f6134; }
+      .verdict.ng { background: #fde2e1; color: #a3231c; border: 1px solid #a3231c; }
+      .verdict.wait { background: #fff4d6; color: #6b4a00; border: 1px solid #8a5a00; }
+      .verdict .sub { display: block; font-size: 13px; font-weight: 400; margin-top: 6px; }
+      .item { display: flex; gap: 10px; padding: 10px 0; border-bottom: 1px solid #eef0ef; align-items: flex-start; }
+      .item:last-child { border-bottom: none; }
+      .mark { flex-shrink: 0; width: 22px; font-size: 17px; text-align: center; line-height: 1.5; }
+      .mark.ok { color: #1f6134; }
+      .mark.ng { color: #a3231c; }
+      .mark.wait { color: #8a5a00; }
+      .body { flex: 1; min-width: 0; }
+      .name { font-weight: 600; font-size: 14px; }
+      .tag {
+        display: inline-block; font-size: 11px; font-weight: 500; margin-left: 6px;
+        padding: 1px 6px; border-radius: 4px; background: #eef0ef; color: #66756f; vertical-align: 1px;
+      }
+      .desc { font-size: 13px; color: #66756f; }
+      .desc.bad { color: #a3231c; }
+      .item.optional .mark.ng { color: #8a5a00; }
+      .item.optional .desc.bad { color: #6b4a00; }
+      h2 { font-size: 15px; margin: 0 0 8px; }
+      textarea {
+        width: 100%; height: 190px; font-family: ui-monospace, monospace; font-size: 12px;
+        border: 1px solid #dfe4e1; border-radius: 8px; padding: 10px; background: #fbfcfb;
+      }
+      button {
+        font: inherit; cursor: pointer; background: #2f6f5e; color: #fff; border: none;
+        border-radius: 8px; padding: 10px 16px; font-size: 14px; margin-top: 8px;
+      }
+      button:hover { background: #1f5346; }
+      .note { font-size: 13px; color: #66756f; }
+      .note strong { color: #23302b; }
+      .note a { color: #2f6f5e; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>動作確認</h1>
+      <p class="lead" id="lead"></p>
+
+      <div id="verdict" class="verdict wait">確認しています…</div>
+
+      <div class="card">
+        <h2>確認結果</h2>
+        <div id="items"></div>
+      </div>
+
+      <div class="card">
+        <h2>この結果を伝える</h2>
+        <p class="note">
+          下の内容をコピーして、販売者までお送りください。
+          <strong>個人情報は含まれていません。</strong>
+        </p>
+        <textarea id="report" readonly></textarea>
+        <button id="copy" type="button">コピーする</button>
+      </div>
+
+      <div class="card" id="extra"></div>
+    </div>
+
+    <script>
+      // 判定は「使えるかどうか」だけを平易に伝える。技術的な用語は出さない。
+      //
+      // 購入前に見てもらうページ(info.yogolabo.com)。アプリのURLはここに書かない。
+      // 通常版に必要な項目を判定し、同期版でだけ必要な項目は「参考」として出す。
+      // 学校のフィルタはドメイン単位(yogolabo.com)で塞ぐのが普通なので、
+      // このページ自身へ接続できれば、アプリも同じ扱いになると見込める。
+      var IS_SYNC = false
+
+      var EDITION = '通常版'
+      var checks = []
+
+      // optional: この版では必須でない項目。× でも総合判定を「使えません」にしない
+      function add(name, state, desc, optional) {
+        checks.push({ name: name, state: state, desc: desc, optional: !!optional })
+      }
+
+      function browserName() {
+        var ua = navigator.userAgent
+        if (ua.indexOf('Edg/') >= 0) return 'Microsoft Edge'
+        if (ua.indexOf('Chrome/') >= 0) return 'Google Chrome'
+        if (ua.indexOf('Firefox/') >= 0) return 'Firefox'
+        if (ua.indexOf('Safari/') >= 0) return 'Safari'
+        if (ua.indexOf('Trident') >= 0 || ua.indexOf('MSIE') >= 0) return 'Internet Explorer'
+        return 'その他のブラウザ'
+      }
+
+      // ブラウザの世代。古いと画面が正しく動かない
+      function checkBrowser() {
+        var name = browserName()
+        if (name === 'Internet Explorer') {
+          add('ブラウザ', 'ng', name + ' では動作しません。Microsoft Edge でお試しください')
+          return
+        }
+        var modern = typeof Promise !== 'undefined' && typeof fetch !== 'undefined' && !!window.CSS
+        if (!modern) {
+          add('ブラウザ', 'ng', name + '（このパソコンのものは古い可能性があります）')
+          return
+        }
+        add('ブラウザ', 'ok', name)
+      }
+
+      // 入力した内容をこのパソコンに保存できるか。ここが最も重要
+      function checkStorage() {
+        return new Promise(function (resolve) {
+          if (!window.indexedDB) {
+            add('入力内容の保存', 'ng', 'このパソコンでは保存できません。設定で制限されている可能性があります')
+            resolve()
+            return
+          }
+          var req
+          try {
+            req = indexedDB.open('yogo-check-test', 1)
+          } catch (e) {
+            add('入力内容の保存', 'ng', 'このパソコンでは保存できません（制限されています）')
+            resolve()
+            return
+          }
+          var done = false
+          var finish = function (ok, msg) {
+            if (done) return
+            done = true
+            add('入力内容の保存', ok ? 'ok' : 'ng', msg)
+            resolve()
+          }
+          req.onupgradeneeded = function () {
+            try { req.result.createObjectStore('t') } catch (e) {}
+          }
+          req.onsuccess = function () {
+            try { req.result.close(); indexedDB.deleteDatabase('yogo-check-test') } catch (e) {}
+            finish(true, '正常に保存できます')
+          }
+          req.onerror = function () { finish(false, 'このパソコンでは保存できません（制限されています）') }
+          req.onblocked = function () { finish(false, 'このパソコンでは保存できません（制限されています）') }
+          setTimeout(function () { finish(false, '保存の確認に時間がかかりました。制限されている可能性があります') }, 5000)
+        })
+      }
+
+      // 画面の設定（配色など）の保存
+      function checkPrefs() {
+        try {
+          localStorage.setItem('yogo-check', '1')
+          localStorage.removeItem('yogo-check')
+          add('画面設定の保存', 'ok', '正常に保存できます')
+        } catch (e) {
+          add('画面設定の保存', 'ng', '保存できません。配色の設定などが毎回戻ります')
+        }
+      }
+
+      // 暗号化機能。同期版でのみ必要
+      function checkCrypto() {
+        var ok = !!(window.crypto && window.crypto.subtle && window.isSecureContext)
+        if (IS_SYNC) {
+          add('暗号化の機能', ok ? 'ok' : 'ng',
+            ok ? '利用できます' : '利用できません。同期版はお使いいただけません')
+        } else {
+          add('暗号化の機能', ok ? 'ok' : 'ng',
+            ok ? '利用できます' : '利用できません（同期版はお使いいただけません。通常版のご利用には影響しません）', true)
+        }
+      }
+
+      // 指定先へ通信できるか。学校のフィルタで塞がれていないかの確認
+      function checkReach(name, url, desc, optional) {
+        return fetch(url, { mode: 'no-cors', cache: 'no-store' })
+          .then(function () { add(name, 'ok', desc + 'に接続できます', optional) })
+          .catch(function () { add(name, 'ng', desc + 'に接続できません。学校のネットワーク制限が考えられます', optional) })
+      }
+
+      function render() {
+        var html = ''
+        var ng = 0
+        var ngOptional = 0
+        for (var i = 0; i < checks.length; i++) {
+          var c = checks[i]
+          if (c.state === 'ng') { if (c.optional) ngOptional++; else ng++ }
+          var mark = c.state === 'ok' ? '○' : c.state === 'ng' ? '×' : '…'
+          var tag = c.optional ? '<span class="tag">同期版のみ</span>' : ''
+          html +=
+            '<div class="item' + (c.optional ? ' optional' : '') + '">' +
+            '<div class="mark ' + c.state + '">' + mark + '</div>' +
+            '<div class="body"><div class="name">' + c.name + tag + '</div>' +
+            '<div class="desc' + (c.state === 'ng' ? ' bad' : '') + '">' + c.desc + '</div></div></div>'
+        }
+        document.getElementById('items').innerHTML = html
+
+        var v = document.getElementById('verdict')
+        if (ng > 0) {
+          v.className = 'verdict ng'
+          v.innerHTML = 'このパソコンではご利用いただけない項目があります' +
+            '<span class="sub">下記の × をご確認ください</span>'
+        } else if (ngOptional > 0) {
+          v.className = 'verdict ok'
+          v.innerHTML = EDITION + 'は、このパソコンでご利用いただけます' +
+            '<span class="sub">同期版でのみ必要な項目に × があります（下記をご確認ください）</span>'
+        } else {
+          v.className = 'verdict ok'
+          v.textContent = 'このパソコンでご利用いただけます'
+        }
+
+        var lines = [
+          '【動作確認の結果】',
+          '確認したページ: 販売前の動作確認ページ',
+          '確認日時: ' + new Date().toLocaleString('ja-JP'),
+          ''
+        ]
+        for (var j = 0; j < checks.length; j++) {
+          var d = checks[j]
+          lines.push(
+            (d.state === 'ok' ? '○ ' : '× ') + d.name +
+            (d.optional ? '（同期版のみ）' : '') + ' : ' + d.desc
+          )
+        }
+        lines.push('')
+        lines.push('画面の幅: ' + window.innerWidth + 'px')
+        document.getElementById('report').value = lines.join('\n')
+      }
+
+      // 通信の内容は正確に書く。「送信しません」とだけ書くと実際の動作と食い違う
+      document.getElementById('lead').innerHTML =
+        '年間業務管理・引き継ぎ支援ツールが、このパソコンで使えるかを確認します。<br />' +
+        'ページを開くだけで自動的に判定します。入力していただく項目はありません。<br />' +
+        'このページ自身と、同期版のデータ保管先へ接続できるかを試します。' +
+        '入力内容や個人情報を送信することはありません。'
+
+      document.getElementById('extra').innerHTML = true
+        ? '<h2>あわせてご確認ください</h2>' +
+          '<p class="note">「同期版のみ」の項目に × がある場合、通常版はお使いいただけますが、同期版はお使いいただけません。</p>' +
+          '<p class="note">次はこのページでは確認できない項目です。同期版をご検討の場合のみ必要です。</p>' +
+          '<p class="note"><strong>・学校のメールが受け取れるか</strong><br />' +
+          '同期版では、サインインのために送られるメールを受け取る必要があります。' +
+          '学校のメールで迷惑メール扱いになる場合は、個人のメールアドレスでのご利用をご検討ください。</p>'
+        : ''
+
+      document.getElementById('copy').addEventListener('click', function () {
+        var t = document.getElementById('report')
+        t.select()
+        try {
+          navigator.clipboard.writeText(t.value)
+          this.textContent = 'コピーしました'
+        } catch (e) {
+          document.execCommand('copy')
+          this.textContent = 'コピーしました'
+        }
+      })
+
+      // 順に確認していく
+      checkBrowser()
+      checkPrefs()
+      checkCrypto()
+      checkStorage()
+        .then(function () {
+          return checkReach('販売元のサイトへの接続', location.origin + '/index.html', '販売元のサイト（yogolabo.com）')
+        })
+        .then(function () {
+          return checkReach(
+            '同期先への接続',
+            'https://zilwexmufolpneakbomz.supabase.co/rest/v1/',
+            '同期版のデータ保管先',
+            true
+          )
+        })
+        .then(render)
+    </script>
+  </body>
+</html>
