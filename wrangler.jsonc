@@ -2,9 +2,21 @@
   // 購入前に見せるページ(利用規約・プライバシーポリシー・動作確認)だけを置く静的サイト。
   // アプリ本体とは別のドメイン(info.yogolabo.com)で配信し、
   // 購入前の資料からアプリのURLが分からないようにする。
+  //
+  // あわせて、Supabaseを眠らせないための定時処理を持つ(src/worker.js)。
+  // ページの配信は assets が行い、ワーカーは当たらなかったパスだけを扱う。
   "name": "yogolabo-info",
   "compatibility_date": "2026-09-05",
+  "main": "./src/worker.js",
   "assets": {
     "directory": "./public"
+  },
+  "triggers": {
+    // 毎日 03:00 UTC(日本時間の正午)に src/worker.js の scheduled が動く
+    "crons": ["0 3 * * *"]
+  },
+  "observability": {
+    // 定時処理の結果をダッシュボードのログで見られるようにする
+    "enabled": true
   }
 }
