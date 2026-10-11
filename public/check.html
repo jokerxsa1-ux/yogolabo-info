@@ -274,9 +274,12 @@
           return checkReach('販売元のサイトへの接続', location.origin + '/index.html', '販売元のサイト（yogolabo.com）')
         })
         .then(function () {
+          // 同期版が実際に使う経路(アプリと同じドメインの取り次ぎ)を試す。
+          // 以前は supabase.co を直接試していたが、本番の通信経路と違うため
+          // 判定が実態と合わなかった。
           return checkReach(
             '同期先への接続',
-            'https://zilwexmufolpneakbomz.supabase.co/rest/v1/',
+            'https://sync.yogolabo.com/supabase/rest/v1/',
             '同期版のデータ保管先',
             true
           )
