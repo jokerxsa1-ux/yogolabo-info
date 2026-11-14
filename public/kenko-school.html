@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>個人情報の取り扱いについて（学校向けの説明資料）｜朝の健康観察集計（養護教諭版）</title>
+    <style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 24px 16px 80px; font-family: 'Hiragino Sans', 'Yu Gothic UI', 'Segoe UI', system-ui, sans-serif;
+         background: #f7f8f7; color: #23302b; line-height: 1.8; font-size: 15px; }
+  .wrap { max-width: 760px; margin: 0 auto; background: #fff; border: 1px solid #dfe4e1; border-radius: 12px; padding: 28px 28px 40px; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  h2 { font-size: 17px; margin: 32px 0 10px; padding-bottom: 6px; border-bottom: 1px solid #dfe4e1; }
+  h3 { font-size: 15px; margin: 22px 0 8px; }
+  h4 { font-size: 14px; margin: 16px 0 6px; }
+  p { margin: 0 0 10px; }
+  ol, ul { padding-left: 1.6em; margin: 0 0 10px; }
+  li { margin: 2px 0; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0 14px; font-size: 14px; }
+  th, td { border: 1px solid #dfe4e1; padding: 6px 10px; vertical-align: top; text-align: left; }
+  th { background: #f1f4f2; font-weight: 600; }
+  blockquote { margin: 10px 0 14px; padding: 10px 14px; background: #f5f7f6; border-left: 4px solid #9fb8ad; font-size: 14px; }
+  pre { background: #f5f7f6; padding: 10px 14px; border-radius: 8px; font-size: 13px; overflow-x: auto; }
+  code { background: #f1f4f2; padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+  hr { border: none; border-top: 1px solid #dfe4e1; margin: 28px 0; }
+  a { color: #2f6f5e; }
+  .meta { font-size: 13px; color: #66756f; margin-bottom: 20px; }
+  .nav { font-size: 13px; color: #66756f; margin-top: 28px; padding-top: 14px; border-top: 1px solid #dfe4e1; }
+  .nav a { margin-right: 14px; }
+  .topbox { border: 2px solid #2f6f5e; border-radius: 10px; padding: 16px 18px; margin: 4px 0 26px; background: #f2f7f5; }
+  .topbox p { margin: 0 0 6px; font-size: 14px; }
+  .topbox .url { font-size: 20px; font-weight: 700; margin: 8px 0 10px; word-break: break-all; }
+  .topbox .url a { color: #1f5346; text-decoration: underline; }
+  @media print { body { background: #fff; padding: 0; } .wrap { border: none; padding: 0; } .nav { display: none; } }
+</style>
+  </head>
+  <body>
+    <div class="wrap">
+<h1>個人情報の取り扱いについて（学校向けの説明資料）</h1>
+<p class="meta">朝の健康観察集計（養護教諭版）</p>
+<p>購入を考えている養護教諭の方が、管理職や学校の情報担当の方に、使ってよいかを相談するときにお使いいただける資料です。この資料に書いてあるのは、アプリの仕組みの事実だけです。<strong>使ってよいかの判断は、学校・設置者が行うものです。</strong></p>
+<p>印刷用：<a href="/kenko-school.pdf">PDF（A4・2ページ）</a></p>
+<hr>
+<h2>1. どんなアプリか</h2>
+<p>朝の健康観察（欠席・遅刻・早退・出席停止・体調不良と症状）の記録を、入力または校内の出欠のファイルから取り込んで、学級別・期間別・年間の集計と、学校保健委員会の資料を作るアプリです。</p>
+<ul><li>形：HTML のファイル1つ。Google Chrome または Microsoft Edge で開いて使います。</li><li>インストール：要りません（パソコンの設定を変えません）。</li><li>販売者：ムギ（個人事業者。BASE ショップ「hokenailab」）</li></ul>
+<h2>2. データがどこにあるか</h2>
+<table><thead><tr><th>項目</th><th>内容</th></tr></thead><tbody><tr><td>保存される場所</td><td>使う人が選んだ場所のファイル（JSON 形式）。保健室のパソコンの中、校内の共有フォルダなど</td></tr><tr><td>外部への送信</td><td><strong>しません。</strong> アプリの中に、外部への接続をすべて止める設定（Content-Security-Policy）が入っています</td></tr><tr><td>販売者への送信</td><td><strong>しません。</strong> 販売者は、学校のデータを見ることができません</td></tr><tr><td>クラウドの利用</td><td>しません（使う人が、クラウドの同期フォルダにファイルを置いた場合を除きます）</td></tr><tr><td>暗号化</td><td>していません。ファイルの置き場所で、見られる人を限ってください</td></tr><tr><td>ブラウザの中に残るもの</td><td>画面の色、説明を見たかどうか、前に開いたファイルの場所など。名簿・記録は残しません</td></tr></tbody></table>
+<h2>3. 扱う情報</h2>
+<table><thead><tr><th>種類</th><th>内容</th></tr></thead><tbody><tr><td>名簿</td><td>学年・組・出席番号・氏名（氏名を使わない運用もできます）</td></tr><tr><td>出欠</td><td>欠席・遅刻・早退・出席停止・不明と、その理由</td></tr><tr><td>健康状態</td><td>体調不良、症状、症状が始まった日</td></tr><tr><td>出席停止</td><td>感染症の名前、登校できる日</td></tr><tr><td>連絡・備考</td><td>連絡の方法と内容、備考</td></tr></tbody></table>
+<p>病気による欠席・症状・感染症の名前は、要配慮個人情報にあたる場合があります。</p>
+<h3>取り込みのときに読まないもの</h3>
+<table><thead><tr><th>取り込むもの</th><th>読まないもの</th></tr></thead><tbody><tr><td>来室記録</td><td>氏名、主訴、体温などのバイタル、経過のメモ</td></tr><tr><td>健診結果・保健調査などの表</td><td>氏名・番号・自由記述など個人が分かる列</td></tr></tbody></table>
+<h3>資料に出すとき</h3>
+<ul><li>期間集計・年間分析は、学年・学級の単位で集計します（氏名は出ません）。</li><li>学校保健委員会の資料には、人数の少ない欄を伏せ字にする設定があります。</li></ul>
+<h2>4. 学校で決めていただきたいこと</h2>
+<table><thead><tr><th>項目</th><th>決めること</th></tr></thead><tbody><tr><td>使う人</td><td>誰が使うか（養護教諭のみ、など）</td></tr><tr><td>使うパソコン</td><td>校内のどのパソコンで使うか</td></tr><tr><td>ファイルの置き場所</td><td>どこに保存するか、誰が見られるか</td></tr><tr><td>バックアップの置き場所</td><td>どこに残すか、いつ消すか</td></tr><tr><td>持ち出し</td><td>USB メモリ・個人のクラウド・自宅のパソコンへ移さない、など</td></tr><tr><td>印刷物</td><td>児童名の入った一覧の保管と処分</td></tr><tr><td>年度末・異動</td><td>ファイルの引き継ぎ先、消し方</td></tr></tbody></table>
+<h2>5. 販売者が受け取る情報</h2>
+<table><thead><tr><th>情報</th><th>いつ</th></tr></thead><tbody><tr><td>購入者の氏名・メールアドレス・注文内容</td><td>購入のとき（販売サイト BASE を通じて）</td></tr><tr><td>お問い合わせの内容</td><td>メールで問い合わせたとき</td></tr></tbody></table>
+<p>販売者は、お問い合わせでも、実在の児童の情報が入ったファイル・画面の写真を受け取らないことにしています。</p>
+<h2>6. 無料の体験版について</h2>
+<p>体験版（Web サイト）は、架空のデータで動きます。保存はできません。体験版は、画面に入力した内容を外部へ送りません（以前あった「ご意見を送る」機能は、2026年11月15日に終了しました）。<strong>体験版には、実在の児童の情報を入れないでください。</strong></p>
+<hr>
+<p>利用規約：<a href="https://info.yogolabo.com/kenko-terms.html">https://info.yogolabo.com/kenko-terms.html</a>プライバシーポリシー：<a href="https://info.yogolabo.com/kenko-privacy.html">https://info.yogolabo.com/kenko-privacy.html</a>お問い合わせ：<a href="mailto:hoken0ai0lab@gmail.com">hoken0ai0lab@gmail.com</a></p>
+<div class="nav">
+  <a href="/kenko-terms.html">利用規約</a>
+  <a href="/kenko-privacy.html">プライバシーポリシー</a>
+  <a href="/kenko-demo.html">体験版について</a>
+  <a href="/kenko-school.html">学校向けの説明資料</a>
+</div>
+    </div>
+  </body>
+</html>
